@@ -1,6 +1,6 @@
 #include "swar_stoi.h"
 
-std::uint32_t parse_uint_simd(const std::string& str) { 
+std::uint32_t parse_uint_swar(const std::string& str) { 
     auto ptr = str.data();
 
     if (str.length() < 8) [[likely]] {
@@ -24,7 +24,7 @@ std::uint32_t parse_uint_simd(const std::string& str) {
     return chunk;
 }
 
-std::uint32_t parse_uint_branch_friendly(const char* ptr) { 
+std::uint32_t parse_uint_predictable(const char* ptr) { 
     std::uint32_t result = 0;
     while (*ptr) [[likely]] result = result * 10 + (*ptr++ - '0');
     return result;

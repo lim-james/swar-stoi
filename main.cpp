@@ -80,21 +80,21 @@ int main() {
             for (const auto& [str, i]: set) 
                 assert(i == std::stol(str));
         }
-        std::println("std::stoi         :: {:.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
+        std::println("std::stoi    :: {:.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
 
         {
             auto _ = ScopeTimer(&tottime);
             for (const auto& [str, i]: set) 
-                assert(i == parse_uint_branch_friendly(str.c_str()));
+                assert(i == parse_uint_predictable(str.c_str()));
         }
-        std::println("Branch friendly   :: {:.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
+        std::println("Predicatable :: {:.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
 
         {
             auto _ = ScopeTimer(&tottime);
             for (const auto& [str, i]: set) 
-                assert(i == parse_uint_simd(str));
+                assert(i == parse_uint_swar(str));
         }
-        std::println("SIMD-Within-A-Reg :: {:.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
+        std::println("SWAR         :: {:.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
 
         std::println();
     }
