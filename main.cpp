@@ -66,9 +66,9 @@ int main() {
 
     auto variable_size_sets = {
         // std::pair{"FIXED  ",  make_range(ITERATIONS, fixed_len_distribution)},
-        std::pair{"LOWER  ",  make_range(ITERATIONS, lower_distribution)},
+        std::pair{"LOWER  ", make_range(ITERATIONS, lower_distribution)},
         std::pair{"MIDDLE ", make_range(ITERATIONS, middle_distribution)},
-        std::pair{"UPPER  ",  make_range(ITERATIONS, upper_distribution)}
+        std::pair{"UPPER  ", make_range(ITERATIONS, upper_distribution)}
     };
 
     std::println("===== THROUGHPUTS =====");
@@ -85,7 +85,7 @@ int main() {
         {
             auto _ = ScopeTimer(&tottime);
             for (const auto& [str, i]: set) 
-                assert(i == parse_uint_predictable(str.c_str()));
+                assert(i == parse_uint_predictable<std::uint32_t>(str.c_str()));
         }
         std::println("Predicatable :: {:.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
 
