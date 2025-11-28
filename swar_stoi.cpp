@@ -1,12 +1,5 @@
 #include "swar_stoi.h"
 
-constexpr std::uint64_t char_mask(std::uint8_t characters) {
-    std::uint64_t mask = 0;
-    for (std::uint8_t i = 0; i < characters; i++)
-        mask = mask << 8 | 0xFF;
-    return mask;
-}
-
 std::uint32_t parse_uint_simd(const std::string& str) { 
     auto ptr = str.data();
 
