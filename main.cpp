@@ -49,57 +49,58 @@ void validate_correctness() {
     std::println("Validated small implementation across 0...{}", std::numeric_limits<std::uint32_t>::max());
 }
 
+void benchmark_throughput(std::size_t iterations)  {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<uint32_t> lower_distribution(0U, 9'999U);
     std::uniform_int_distribution<uint32_t> middle_distribution(10'000U, 9'999'999U);
-    std::uniform_int_distribution<uint32_t> fixed_len_distribution(1'000U, 9'999U);
     std::uniform_int_distribution<uint32_t> upper_distribution(10'000'000U, 4'294'967'294U);
-
-    auto make_str_int_pair = std::views::transform([](auto i) {
-        return std::make_pair(std::to_string(i), i);
-    });
 
     auto make_range = [&](size_t n, auto& dist) {
         return std::views::iota(0u, static_cast<uint32_t>(n))
              | std::views::transform([&](auto) { return dist(gen); })
-             | make_str_int_pair;
+             | std::views::transform([](auto i) { return std::to_string(i); });;
     };
 
     auto variable_size_sets = {
-        // std::pair{"FIXED  ",  make_range(ITERATIONS, fixed_len_distribution)},
-        std::pair{"LOWER  ", make_range(ITERATIONS, lower_distribution)},
-        std::pair{"MIDDLE ", make_range(ITERATIONS, middle_distribution)},
-        std::pair{"UPPER  ", make_range(ITERATIONS, upper_distribution)}
+        std::pair{"LOWER   (4 char) ", make_range(iterations, lower_distribution)},
+        std::pair{"MIDDLE  (7 char) ", make_range(iterations, middle_distribution)},
+        std::pair{"UPPER (> 8 char) ", make_range(iterations, upper_distribution)}
     };
 
-    std::println("===== THROUGHPUTS =====");
+    std::println("===== BENCHMARK THROUGHPUTS =====");
+
+    volatile std::uint32_t sink;
 
     for (const auto& [name, set]: variable_size_sets) {
+        std::println("{}", name);
         double tottime;
         {
             auto _ = ScopeTimer(&tottime);
-            for (const auto& [str, i]: set) 
-                assert(i == std::stol(str));
+            for (const auto& str: set) 
+                sink = std::stol(str);
         }
-        std::println("std::stoi    :: {:.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
+        std::println("std::stoi    :: {:7.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
 
         {
             auto _ = ScopeTimer(&tottime);
-            for (const auto& [str, i]: set) 
-                assert(i == parse_uint_predictable<std::uint32_t>(str.c_str()));
+            for (const auto& str: set) 
+                sink = parse_uint_predictable<std::uint32_t>(str.c_str());
         }
-        std::println("Predicatable :: {:.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
+        std::println("Predicatable :: {:7.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
 
         {
             auto _ = ScopeTimer(&tottime);
-            for (const auto& [str, i]: set) 
-                assert(i == parse_uint_swar(str));
+            for (const auto& str: set) 
+                sink = parse_uint32_swar(str);
         }
-        std::println("SWAR         :: {:.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
-
-        std::println();
+        std::println("SWAR         :: {:7.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
     }
+}
+
+int main() {
+    validate_correctness();
+    benchmark_throughput(100'000'000);
 
     return 0;
 }
