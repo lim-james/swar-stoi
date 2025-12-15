@@ -8,6 +8,7 @@
 #include <utility>
 #include <random>
 #include <format>
+#include <limits>
 
 #include "swar_stoi.h"
 
@@ -38,14 +39,15 @@ constexpr double calculate_throughput_per_ms(double tottime_ms, std::size_t ncal
 
 }
 
-int main() {
-    constexpr std::size_t ITERATIONS  = 10'000'000;
+void validate_correctness() {
+    for (std::uint32_t i{}; i < std::numeric_limits<std::uint32_t>::max(); ++i) 
+        assert(parse_uint32_swar(std::to_string(i)) == i);
+    std::println("Validated swar implementation across 0...{}", std::numeric_limits<std::uint32_t>::max());
 
-    constexpr std::array<std::uint32_t, 4> bounds{
-        10'000,         // 4 chars
-        10'000'000,     // 7 chars
-        4'294'967'294   // >= 8 chars
-    };
+    for (std::uint32_t i{}; i < std::numeric_limits<std::uint32_t>::max(); ++i) 
+        assert(parse_uint_predictable<std::uint32_t>(std::to_string(i).c_str()) == i);
+    std::println("Validated small implementation across 0...{}", std::numeric_limits<std::uint32_t>::max());
+}
 
     std::random_device rd;
     std::mt19937 gen(rd());
