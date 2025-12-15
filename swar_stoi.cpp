@@ -1,6 +1,6 @@
 #include "swar_stoi.h"
 
-std::uint32_t parse_uint_swar(const std::string& str) { 
+std::uint32_t parse_uint32_swar(const std::string& str) { 
     auto ptr = str.data();
 
     if (str.length() < 8) [[likely]] {
