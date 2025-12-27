@@ -64,7 +64,7 @@ void benchmark_throughput(std::size_t iterations)  {
         {
             auto _ = ScopeTimer(&tottime);
             for (const auto& str: set) 
-                sink = parse_uint_predictable<std::uint32_t>(str.c_str());
+                sink = parse_uint_predictable<std::uint32_t>(str.c_str()).value();
         }
         std::println("Predicatable :: {:7.0f} ints/ms", calculate_throughput_per_ms(tottime, set.size()));
 
@@ -130,7 +130,7 @@ void perf_cpu_cycles(std::size_t iterations)  {
 
         if (auto [instr,cyc] = record(&instructions, &cpu_cycles); instr && cyc) {
             for (const auto& str: set) 
-                sink = parse_uint_predictable<std::uint32_t>(str.c_str());
+                sink = parse_uint_predictable<std::uint32_t>(str.c_str()).value();
         }
         std::println("Predicatable | {:10} | {:10} ", cpu_cycles, instructions);
 
