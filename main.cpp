@@ -7,7 +7,7 @@
 #include "scoped_timer.hpp"
 #include "perf_event.hpp"
 
-#include "swar_stoi.h"
+#include "swar_stoi.hpp"
 
 constexpr double calculate_throughput_per_s(double tottime_ms, std::size_t ncalls) {
     constexpr double ms_to_s = 1'000.0;
