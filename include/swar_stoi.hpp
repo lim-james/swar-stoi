@@ -32,12 +32,13 @@ std::uint32_t parse_uint32_swar(const std::string& str) {
 }
 
 template<std::unsigned_integral U>
-std::expected<U, parse_error> parse_uint_predictable(const char* ptr) { 
+std::expected<U, parse_error> parse_uint_predictable(const std::string& str) { 
     constexpr U MAX = std::numeric_limits<U>::max();
     constexpr U MAX_DIV_10 = MAX / 10;
     constexpr U MAX_MOD_10 = MAX % 10;
 
     U result = 0;
+    auto ptr = str.data();
     while (*ptr) [[likely]] {
         char c = *ptr++;
         if (c < '0' || c > '9') return std::unexpected(parse_error::invalid_character);
