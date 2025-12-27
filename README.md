@@ -1,9 +1,10 @@
 # SWAR (SIMD-Within-A-Register) STOI
 
-> Initially belonged under low-latency-experiments, but I decided to make it a
-> project of its own.
+## Performance Summary
+Benchmarks were conducted on X86_64 hardware using Linux perf events to capture 
+instruction-level metrics. My SWAR implementation consistently outperforms the 
+standard library, particularly on longer numeric strings.
 
-I was wondering if std::stoi could be faster. At a cost of being unsafe.
 
 | Scenario | Method | Throughput (ints/ms) | Total Cycles | Total Instructions | IPC |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -16,3 +17,11 @@ I was wondering if std::stoi could be faster. At a cost of being unsafe.
 | **UPPER**<br>*(>8 chars)* | `std::stoi` | 18,937 | 13,983,575 | 57,036,103 | 4.08 |
 | | `Predictable` | 27,846 | 9,519,478 | 32,880,368 | 3.45 |
 | | `SWAR` | **28,140** | **9,213,281** | **30,733,778** | 3.34 |
+
+
+## Getting Started
+
+```sh
+g++ -std=c++23 -O3 -march=native *.cpp -o swar_benchmark
+sudo ./swar_benchmark # run w/ root for access to perf counters
+```
