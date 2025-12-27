@@ -11,7 +11,7 @@ enum class parse_error {
     overflow
 };
 
-std::uint32_t parse_uint32_swar(const std::string& str) { 
+inline std::uint32_t parse_uint32_swar(const std::string& str) { 
     auto ptr = str.data();
 
     if (str.length() < 8) [[likely]] {
@@ -32,7 +32,7 @@ std::uint32_t parse_uint32_swar(const std::string& str) {
 }
 
 template<std::unsigned_integral U>
-std::expected<U, parse_error> parse_uint_predictable(const std::string& str) { 
+std::expected<U, parse_error> stou(const std::string& str) { 
     constexpr U MAX = std::numeric_limits<U>::max();
     constexpr U MAX_DIV_10 = MAX / 10;
     constexpr U MAX_MOD_10 = MAX % 10;
@@ -41,6 +41,7 @@ std::expected<U, parse_error> parse_uint_predictable(const std::string& str) {
     auto ptr = str.data();
     while (*ptr) [[likely]] {
         char c = *ptr++;
+        if (c == ' ') continue;
         if (c < '0' || c > '9') return std::unexpected(parse_error::invalid_character);
 
         U i = (c - '0');
