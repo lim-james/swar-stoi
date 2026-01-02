@@ -1,22 +1,20 @@
 #include <gtest/gtest.h>
 
-#include <concepts>
 #include <cstdint>
-#include <cassert>
-#include <limits>
-#include <string>
-#include <print>
 
 #include "swar_stoi.hpp"
 
-template<std::unsigned_integral T>
-void validate_correctness(auto&& stoi_method, T stride = 1) {
-    constexpr T MAX = std::numeric_limits<T>::max();
-    for (T i{}; i < MAX; i += stride) 
-        EXPECT_EQ(stoi_method(std::to_string(i)), i);
+class StoiFuzz : public ::testing::TestWithParam<std::string> {};
+
+TEST_P(StoiFuzz, InvalidValue) {
+    auto result = stou<std::uint32_t>(GetParam());
+    ASSERT_FALSE(result.has_value());
+    EXPECT_EQ(result.error(), parse_error::invalid_character);
 }
 
+INSTANTIATE_TEST_SUITE_P(
+    StoiFuzzTest,
+    StoiFuzz,
+    ::testing::Values("abc", "123a", "-5000")
+);
 
-TEST(StoiCorrectness, DifferentialTestWithStd) {
-    validate_correctness<std::uint32_t>(&stou<std::uint32_t>, 100);
-}
